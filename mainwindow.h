@@ -13,6 +13,12 @@ class MainWindow : public QMainWindow
 
 private slots:
     void SerialReceived();
+    void SerialStart();
+    void SerialStop();
+
+    void on_btnStart_clicked();
+
+    void on_btnStop_clicked();
 
 public:
     explicit MainWindow(QWidget *parent = 0);

@@ -13,6 +13,7 @@ QFile file( filename );
 int nMilliseconds = 0;  // Başlangıçtan itibaren kaç mili sn geçtiğini tutacak olan integer oluşturuluyor.
 float nSeconds = 0; //Ekranda geçen saniye zamanı göstermek için
 
+int onetimestart=0;
 QString str ;   // Seriport tan alınan verinin tutulacağı string
 
 QTime myTimer;  // time sınıfından başlangıçtan itibaren süreyi takip etmek için nesne oluşturuluor.
@@ -25,19 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     myTimer.start();    //zamanlayıcı başlatılıyor.
 
-    //Serial Port Ayarları yapılıyor..
-    serial = new QSerialPort(this);
-    serial->setPortName("COM4");
-    serial->setBaudRate(QSerialPort::Baud9600);
-    serial->setDataBits(QSerialPort::Data8);
-    serial->setParity(QSerialPort::NoParity);
-    serial->setStopBits(QSerialPort::OneStop);
-    serial->setFlowControl(QSerialPort::NoFlowControl);
 
-    serial->open(QIODevice::ReadWrite); //Seri Port açılıyor
+    //    SerialStart();
 
-    //Seri Port Signal and Slotu bağlanıyor.
-    connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
+
+
 
     // Yazma işlemi için dosya açılıyor.
     file.open(QIODevice::ReadWrite);
@@ -85,4 +78,46 @@ void MainWindow::SerialReceived()
     str.clear();    // str stringi yeni değer alması için temizleniyor.
 
     ui->label_4->setText(sn);
+}
+
+void MainWindow::SerialStart()
+{
+    if(onetimestart<=0)
+    {
+    //Serial Port Ayarları yapılıyor..
+    serial = new QSerialPort(this);
+    serial->setPortName("COM3");
+    serial->setBaudRate(QSerialPort::Baud9600);
+    serial->setDataBits(QSerialPort::Data8);
+    serial->setParity(QSerialPort::NoParity);
+    serial->setStopBits(QSerialPort::OneStop);
+    serial->setFlowControl(QSerialPort::NoFlowControl);
+
+    //Seri Port açılıyor
+    serial->open(QIODevice::ReadWrite);
+
+    //Seri Port Signal and Slotu bağlanıyor.
+    connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
+
+    onetimestart=1;
+    }
+
+}
+
+void MainWindow::SerialStop()
+{
+
+     serial->close();    //Serial Port kapatılıyor..
+     onetimestart = -1;
+
+}
+
+void MainWindow::on_btnStart_clicked()
+{
+    SerialStart();
+}
+
+void MainWindow::on_btnStop_clicked()
+{
+    SerialStop();
 }
