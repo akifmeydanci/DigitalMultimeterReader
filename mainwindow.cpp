@@ -62,12 +62,12 @@ void MainWindow::SerialReceived()
     //Dosyaya yazma işlemleri yapılıyor..
     if(!str.isEmpty())  //serial received fonksiyonu çalıştığı halde str boşsa işlem yapma.
         {
-        //Boşluk ve new tab,endline temizleniyor..
+        //Boşluk ve new tab,endline temizleniyor...
         str = str.simplified();
         str = str.remove("\n");
         str = str.remove("\r");
 
-        // csv dosyasına alınan veri işleniyor..
+        // csv dosyasına alınan veri işleniyor...
         QTextStream stream( &file );
 
         // Geçen zaman; No ; Vdd ; Vout ; Idd \n
