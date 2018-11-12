@@ -5,8 +5,9 @@
 #include <QTime>
 #include <QFile>
 #include <QTextStream>
+#include "mySerialPort.h"
 
-QSerialPort *serial;            // Serial Port sınıfından serial nesnesi oluşturuyoruz.
+mySerialPort *serial;            // Serial Port sınıfından serial nesnesi oluşturuyoruz.
 QString filename="Data.csv";    // Serial porttan okunan verilerin aktarıldığı dosya oluşturuluyor.
 QFile file( filename );
 
@@ -14,9 +15,9 @@ int nMilliseconds = 0;  // Başlangıçtan itibaren kaç mili sn geçtiğini tut
 float nSeconds = 0; //Ekranda geçen saniye zamanı göstermek için
 
 int onetimestart=0;
-QString str ;   // Seriport tan alınan verinin tutulacağı string
+QString received_data;   // Seriport tan alınan verinin tutulacağı string
 
-QTime myTimer;  // time sınıfından başlangıçtan itibaren süreyi takip etmek için nesne oluşturuluor.
+QTime *myTimer;  // time sınıfından başlangıçtan itibaren süreyi takip etmek için nesne oluşturuluor.
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,13 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    myTimer.start();    //zamanlayıcı başlatılıyor.
-
-
-    //    SerialStart();
-
-
-
+	myTimer = new QTime();
+    myTimer->start();    //zamanlayıcı başlatılıyor.
 
     // Yazma işlemi için dosya açılıyor.
     file.open(QIODevice::ReadWrite);
@@ -45,79 +41,54 @@ MainWindow::~MainWindow()
 //Serialreceived Fonksiyonu ekleniyor..
 void MainWindow::SerialReceived()
 {
-    //Okuma alanında veri olduğu sürece str verisi dolduruluyor.
-    while(serial->canReadLine())
-    {
-    str.append(serial->readAll());
-    }
+   
+   received_data = serial->getSerialData();
+   
     //Zamanlayıcı başlatıldığından itibaren geçen süre hesaplanıyor.
-    nMilliseconds = myTimer.elapsed();
+    nMilliseconds = myTimer->elapsed();
     nSeconds = nMilliseconds/1000;
     QString s = QString::number(nMilliseconds); //Süre string e çeviriliyor
      QString sn = QString::number(nSeconds); //Süre ekranda gösterilmek için  saniyeye cevirilyor.
     //Alınan değer ekranda gösteriliyor
-    ui->label->setText(str);
-    //ui->textBrowser->setText(str);
+    ui->label->setText(received_data);
+    //ui->textBrowser->setText(received_data);
 
     //Dosyaya yazma işlemleri yapılıyor..
-    if(!str.isEmpty())  //serial received fonksiyonu çalıştığı halde str boşsa işlem yapma.
+    if(!received_data.isEmpty())  //serial received fonksiyonu çalıştığı halde received_data boşsa işlem yapma.
         {
         //Boşluk ve new tab,endline temizleniyor...
-        str = str.simplified();
-        str = str.remove("\n");
-        str = str.remove("\r");
+        received_data = received_data.simplified();
+        received_data = received_data.remove("\n");
+        received_data = received_data.remove("\r");
 
         // csv dosyasına alınan veri işleniyor...
         QTextStream stream( &file );
 
         // Geçen zaman; No ; Vdd ; Vout ; Idd \n
-        stream << s << ";"<< str << "\n" ;
+        stream << s << ";"<< received_data << "\n" ;
 
     }
 
-    str.clear();    // str stringi yeni değer alması için temizleniyor.
+    received_data.clear();    // received_data stringi yeni değer alması için temizleniyor.
 
     ui->label_4->setText(sn);
 }
 
-void MainWindow::SerialStart()
-{
-    if(onetimestart<=0)
-    {
-    //Serial Port Ayarları yapılıyor..
-    serial = new QSerialPort(this);
-    serial->setPortName("COM3");
-    serial->setBaudRate(QSerialPort::Baud9600);
-    serial->setDataBits(QSerialPort::Data8);
-    serial->setParity(QSerialPort::NoParity);
-    serial->setStopBits(QSerialPort::OneStop);
-    serial->setFlowControl(QSerialPort::NoFlowControl);
-
-    //Seri Port açılıyor
-    serial->open(QIODevice::ReadWrite);
-
-    //Seri Port Signal and Slotu bağlanıyor.
-    connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
-
-    onetimestart=1;
-    }
-
-}
-
-void MainWindow::SerialStop()
-{
-
-     serial->close();    //Serial Port kapatılıyor..
-     onetimestart = -1;
-
-}
-
 void MainWindow::on_btnStart_clicked()
 {
-    SerialStart();
+    if(serial->isUsed() == false) {
+		if(serial->open(QIODevice::ReadWrite) == true) {
+            serial->setUsedFlag(true);
+		}
+	}
+	//Seri Port Signal and Slotu bağlanıyor.
+    connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
+	
 }
 
 void MainWindow::on_btnStop_clicked()
 {
-    SerialStop();
+    if(serial->isUsed() == true) {
+		serial->close();    //Serial Port kapatılıyor..
+	}
 }

@@ -13,8 +13,6 @@ class MainWindow : public QMainWindow
 
 private slots:
     void SerialReceived();
-    void SerialStart();
-    void SerialStop();
 
     void on_btnStart_clicked();
 
