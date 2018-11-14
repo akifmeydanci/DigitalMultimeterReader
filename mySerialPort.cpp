@@ -17,7 +17,8 @@ mySerialPort::mySerialPort() {
     this->setDataBits(QSerialPort::Data8);
     this->setParity(QSerialPort::NoParity);
     this->setStopBits(QSerialPort::OneStop);
-    this->setFlowControl(QSerialPort::NoFlowControl);	
+    this->setFlowControl(QSerialPort::NoFlowControl);
+    COMPortName = "COM56";
 }
 
 mySerialPort::updatePortName(QString str) {
@@ -25,7 +26,7 @@ mySerialPort::updatePortName(QString str) {
 }
 
 QString mySerialPort::getSerialData() {
-	QString str;
+    QString str = "Hello";
 	  while(this->canReadLine())
     {
     str.append(this->readAll());

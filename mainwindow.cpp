@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    serial = new mySerialPort();
 	myTimer = new QTime();
     myTimer->start();    //zamanlayıcı başlatılıyor.
 
@@ -81,6 +82,9 @@ void MainWindow::on_btnStart_clicked()
             serial->setUsedFlag(true);
 		}
 	}
+    else {
+        return;
+    }
 	//Seri Port Signal and Slotu bağlanıyor.
     connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
 	
