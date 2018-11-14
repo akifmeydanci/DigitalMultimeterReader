@@ -9,10 +9,10 @@ class mySerialPort : public QSerialPort {
 	public:
 	mySerialPort();
     mySerialPort(QString str);
-	updatePortName(QString str);
+    void updatePortName(QString str);
 	QString getSerialData();
 	bool isUsed();
-	setUsedFlag(bool state);
+    void setUsedFlag(bool state);
 };
 
 

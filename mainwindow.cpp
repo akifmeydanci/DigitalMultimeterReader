@@ -42,9 +42,10 @@ MainWindow::~MainWindow()
 //Serialreceived Fonksiyonu ekleniyor..
 void MainWindow::SerialReceived()
 {
-   
+
    received_data = serial->getSerialData();
-   
+
+
     //Zamanlayıcı başlatıldığından itibaren geçen süre hesaplanıyor.
     nMilliseconds = myTimer->elapsed();
     nSeconds = nMilliseconds/1000;
@@ -72,6 +73,8 @@ void MainWindow::SerialReceived()
 
     received_data.clear();    // received_data stringi yeni değer alması için temizleniyor.
 
+    serial->write("Ok!\n");
+
     ui->label_4->setText(sn);
 }
 
@@ -85,6 +88,7 @@ void MainWindow::on_btnStart_clicked()
     else {
         return;
     }
+
 	//Seri Port Signal and Slotu bağlanıyor.
     connect(serial,SIGNAL(readyRead()),this,SLOT(SerialReceived()));
 	

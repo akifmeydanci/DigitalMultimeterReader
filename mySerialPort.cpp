@@ -9,6 +9,7 @@ mySerialPort::mySerialPort(QString str) {
     this->setParity(QSerialPort::NoParity);
     this->setStopBits(QSerialPort::OneStop);
     this->setFlowControl(QSerialPort::NoFlowControl);
+    portIsUsed = false;
 }
 
 mySerialPort::mySerialPort() {
@@ -19,19 +20,18 @@ mySerialPort::mySerialPort() {
     this->setStopBits(QSerialPort::OneStop);
     this->setFlowControl(QSerialPort::NoFlowControl);
     COMPortName = "COM56";
+    portIsUsed = false;
 }
 
-mySerialPort::updatePortName(QString str) {
+void mySerialPort::updatePortName(QString str) {
 	this->setPortName(str);
 }
 
 QString mySerialPort::getSerialData() {
-    QString str = "Hello";
-	  while(this->canReadLine())
-    {
+    QString str;
+
     str.append(this->readAll());
-    }
-	
+
 	return str;
 }
 
@@ -39,6 +39,6 @@ bool mySerialPort::isUsed() {
 	return portIsUsed;
 }
 
-mySerialPort::setUsedFlag(bool state) {
+void mySerialPort::setUsedFlag(bool state) {
 	portIsUsed = state;
 }
